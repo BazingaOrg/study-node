@@ -103,13 +103,13 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 tourSchema.post(/^find/, function (doc, next) {
-  console.log(doc);
+  // console.log(doc);
   next();
 });
 
 // Aggregate middleware
 tourSchema.pre('aggregate', function (next) {
-  console.log(this.pipeline());
+  // console.log(this.pipeline());
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });

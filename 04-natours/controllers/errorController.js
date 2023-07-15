@@ -45,18 +45,24 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = (err) => new AppError(err.message, 401);
+
+const handleTokenExpiredError = (err) => new AppError(err.message, 401);
+
 module.exports = (err, req, res, next) => {
   // console.log(err.stack);
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
-  } else if (process.env.NODE_ENV !== 'production') {
+  } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     const errorMapDB = new Map()
       .set('CastError', handleCastErrorDB)
       .set('MongoError', handleDuplicateFieldsDB)
-      .set('ValidationError', handleValidationErrorDB);
+      .set('ValidationError', handleValidationErrorDB)
+      .set('JsonWebTokenError', handleJWTError)
+      .set('TokenExpiredError', handleTokenExpiredError);
     errorMapDB.get(error.name) && (error = errorMapDB.get(error.name)(error));
     sendErrorProd(error, res);
   }
